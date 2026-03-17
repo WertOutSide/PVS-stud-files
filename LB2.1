@@ -1,0 +1,112 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cmath>
+#include <cstring>
+
+using namespace std;
+
+// === ОШИБКА 1: V501 — Одинаковые условия в ветках if/else ===
+void checkValues(int a, int b) {
+    if (a > b) {
+        cout << "A больше B" << endl;
+    } else if (a > b) {  // ⚠️ Ошибка: условие дублируется
+        cout << "A меньше B" << endl;
+    } else {
+        cout << "A равно B" << endl;
+    }
+}
+
+// === ОШИБКА 2: V595 — Указатель используется до проверки на nullptr ===
+void processPointer(int* ptr) {
+    int value = *ptr;  // ⚠️ Ошибка: разыменование до проверки
+    cout << "Value: " << value << endl;
+    
+    if (ptr != nullptr) {
+        cout << "Pointer is valid" << endl;
+    }
+}
+
+// === ОШИБКА 3: V501 — Copy-Paste ошибка (одинаковые операнды) ===
+void checkStrings(const string& s1, const string& s2) {
+    if (s1.length() > 0 && s1.length() > 0) {  // ⚠️ Ошибка: s1 проверено дважды
+        cout << "Обе строки не пустые" << endl;
+    }
+}
+
+// === ОШИБКА 4: V609 — Лишний вызов функции (модуль положительного числа) ===
+void checkPositive(int x) {
+    if (x > 0 && abs(x) > 0) {  // ⚠️ Ошибка: abs(x) избыточен, если x > 0
+        cout << "X положительно" << endl;
+    }
+}
+
+// === ОШИБКА 5: V560 — Часть условного выражения всегда истинна/ложна ===
+void checkRange(int value) {
+    if (value > 0 && value < 100 || value > 0) {  // ⚠️ Ошибка: value > 0 дублируется
+        cout << "Value in range or positive" << endl;
+    }
+}
+
+// === ОШИБКА 6: V535 — Неинициализированная переменная ===
+void calculateSum() {
+    int sum;  // ⚠️ Ошибка: переменная не инициализирована
+    for (int i = 1; i <= 5; i++) {
+        sum += i;  // Неопределённое поведение
+    }
+    cout << "Sum: " << sum << endl;
+}
+
+// === ОШИБКА 7: V547 — Проверка указателя после разыменования ===
+void checkArray(int* arr, int size) {
+    if (arr != nullptr && size > 0) {
+        cout << arr[0] << endl;
+    }
+    if (arr == nullptr) {  // ⚠️ Ошибка: мёртвый код, arr уже проверен выше
+        cout << "Array is null" << endl;
+    }
+}
+
+// === ОШИБКА 8: V571 — Проверка несовместимых типов ===
+void checkChar(char c) {
+    if (c == NULL) {  // ⚠️ Ошибка: char сравнивается с NULL (указателем)
+        cout << "Char is null" << endl;
+    }
+}
+
+// === ОШИБКА 9: V501 — Одинаковые аргументы в функции ===
+void compareValues(int a, int b) {
+    int min_val = min(a, a);  // ⚠️ Ошибка: сравниваем a с самим собой
+    cout << "Min: " << min_val << endl;
+}
+
+// === ОШИБКА 10: V597 — Неверный приоритет операторов ===
+void checkFlags(int flags) {
+    if (flags & 0x01 == 0x01) {  // ⚠️ Ошибка: == выполняется раньше &
+        cout << "Flag is set" << endl;
+    }
+}
+
+int main() {
+    cout << "=== PVS-Studio Test Program ===" << endl << endl;
+    
+    checkValues(5, 10);
+    
+    int* ptr = nullptr;
+    // processPointer(ptr);  // Раскомментировать для теста (будет crash)
+    
+    checkStrings("Hello", "World");
+    checkPositive(5);
+    checkRange(50);
+    calculateSum();
+    
+    int arr[] = {1, 2, 3};
+    checkArray(arr, 3);
+    
+    checkChar('A');
+    compareValues(10, 20);
+    checkFlags(0x01);
+    
+    cout << endl << "=== Test Complete ===" << endl;
+    return 0;
+}
