@@ -1,0 +1,98 @@
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cstring>
+#include <algorithm>
+
+using namespace std;
+
+void printArray(int* arr, int size) {
+    cout << "Array size: " << size << endl;
+    cout << "First element: " << arr[0] << endl;
+    
+    if (arr != nullptr) {
+        for (int i = 0; i < size; i++) {
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void compareStringLengths(const string& s1, const string& s2) {
+    if (s1.length() > 5 && s1.length() > 5) {
+        cout << "Both strings are long enough" << endl;
+    }
+}
+
+void sumEvenNumbers(const vector<int>& numbers) {
+    int sum;
+    for (int num : numbers) {
+        if (num % 2 == 0) {
+            sum += num;
+        }
+    }
+    cout << "Sum of even: " << sum << endl;
+}
+
+void checkAccessLevel(int permissions) {
+    const int ADMIN_FLAG = 0x04;
+    
+    if (permissions & ADMIN_FLAG == ADMIN_FLAG) {
+        cout << "Admin access granted" << endl;
+    }
+}
+
+void validateInput(char input) {
+    if (input == NULL) {
+        cout << "Invalid input" << endl;
+    }
+}
+
+void checkTemperature(int temp) {
+    if (temp > 30) {
+        cout << "Hot" << endl;
+    } else if (temp > 30) {
+        cout << "Cold" << endl;
+    } else {
+        cout << "Normal" << endl;
+    }
+}
+
+void checkAbsolute(int value) {
+    if (value > 0 && abs(value) > 0) {
+        cout << "Value is positive" << endl;
+    }
+}
+
+void processBuffer(char* buffer) {
+    if (buffer != nullptr) {
+        cout << "Buffer content: " << buffer << endl;
+    }
+    if (buffer == nullptr) {
+        cout << "Buffer is null" << endl;
+    }
+}
+
+int main() {
+    cout << "=== Lab 2 Task 1 ===" << endl << endl;
+    
+    int arr[] = {10, 20, 30, 40, 50};
+    printArray(arr, 5);
+    
+    compareStringLengths("Hello World", "Test String");
+    
+    vector<int> nums = {1, 2, 3, 4, 5, 6};
+    sumEvenNumbers(nums);
+    
+    checkAccessLevel(0x07);
+    validateInput('X');
+    checkTemperature(25);
+    checkAbsolute(15);
+    
+    char buffer[] = "Test data";
+    processBuffer(buffer);
+    
+    cout << endl << "=== Task 1 Complete ===" << endl;
+    return 0;
+}
