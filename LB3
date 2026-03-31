@@ -2,111 +2,134 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include <fstream>
-#include <string>
 
 using namespace std;
 
-void copyUsername(const char* input) {
-    char username[32];
-    strcpy(username, input);
-    cout << "Username: " << username << endl;
+void bufferOverflow1(const char* input) {
+    char buffer[32];
+    strcpy(buffer, input);
+    cout << buffer << endl;
 }
 
-void logMessage(const char* userMessage) {
-    printf(userMessage);
+void bufferOverflow2(const char* dir, const char* file) {
+    char path[64];
+    sprintf(path, "%s/%s", dir, file);
+    cout << path << endl;
+}
+
+void formatString(const char* msg) {
+    printf(msg);
     printf("\n");
 }
 
-void readFile(const char* filename) {
-    char command[256];
-    sprintf(command, "cat %s", filename);
-    system(command);
-}
-
-void findUser(const char* username) {
-    char query[512];
-    sprintf(query, "SELECT * FROM users WHERE name = '%s'", username);
-    cout << "Executing: " << query << endl;
-}
-
-void loadConfig(const char* configName) {
-    string path = "/etc/app/configs/";
-    path += configName;
-    
-    ifstream file(path);
-    if (file.is_open()) {
-        cout << "Config loaded from: " << path << endl;
+void nullPointerDeref(int* ptr) {
+    int value = *ptr;
+    cout << value << endl;
+    if (ptr != nullptr) {
+        cout << "Valid" << endl;
     }
 }
 
-void encryptData(char* data, int len) {
-    for (int i = 0; i < len; i++) {
-        data[i] = data[i] ^ 0x42;
+void uninitializedVar() {
+    int sum;
+    for (int i = 0; i < 5; i++) {
+        sum += i;
     }
-    cout << "Data encrypted" << endl;
+    cout << sum << endl;
 }
 
-void readInput() {
-    char buffer[100];
-    gets(buffer);
-    cout << "Input: " << buffer << endl;
-}
-
-void processData() {
+void useAfterFree() {
     int* data = new int[10];
     delete[] data;
     data[0] = 42;
-    cout << "Data processed" << endl;
+    cout << data[0] << endl;
 }
 
-void buildPath(const char* dir, const char* file) {
-    char path[64];
-    sprintf(path, "%s/%s", dir, file);
-    cout << "Path: " << path << endl;
+void memoryLeak() {
+    char* buffer = new char[1024];
+    strcpy(buffer, "test");
+    cout << buffer << endl;
 }
 
-void executeCommand(const char* cmd) {
-    FILE* pipe = popen(cmd, "r");
-    if (pipe) {
-        char result[128];
-        while (fgets(result, sizeof(result), pipe) != NULL) {
-            cout << result;
-        }
-        pclose(pipe);
+void identicalCondition(int a, int b) {
+    if (a > b) {
+        cout << "Greater" << endl;
+    } else if (a > b) {
+        cout << "Less" << endl;
     }
 }
 
-void parsePort(const char* portStr) {
-    int port = atoi(portStr);
-    cout << "Connecting to port: " << port << endl;
+void copyPasteError(const char* s1, const char* s2) {
+    if (strlen(s1) > 0 && strlen(s1) > 0) {
+        cout << "Both valid" << endl;
+    }
 }
 
-void allocateBuffer() {
-    char* buffer = new char[1024];
-    strcpy(buffer, "Temporary data");
-    cout << "Buffer allocated: " << buffer << endl;
+void wrongPriority(int flags) {
+    if (flags & 0x01 == 0x01) {
+        cout << "Flag set" << endl;
+    }
+}
+
+void charCompare(char c) {
+    if (c == NULL) {
+        cout << "Null char" << endl;
+    }
+}
+
+void redundantCheck(int x) {
+    if (x > 0 && abs(x) > 0) {
+        cout << "Positive" << endl;
+    }
+}
+
+void deadCode(int* ptr) {
+    if (ptr != nullptr) {
+        cout << *ptr << endl;
+    }
+    if (ptr == nullptr) {
+        cout << "Null" << endl;
+    }
+}
+
+void dangerousFunction() {
+    char buffer[100];
+    gets(buffer);
+    cout << buffer << endl;
+}
+
+void commandInjection(const char* filename) {
+    char cmd[256];
+    sprintf(cmd, "cat %s", filename);
+    system(cmd);
 }
 
 int main() {
-    cout << "=== Lab 3: Vulnerability Pattern Detection ===" << endl << endl;
+    cout << "=== Lab 3: PVS-Studio Test ===" << endl;
     
-    copyUsername("admin");
-    logMessage("Test message");
-    readFile("test.txt");
-    findUser("admin");
-    loadConfig("settings.conf");
+    bufferOverflow1("test");
+    bufferOverflow2("/home", "file.txt");
+    formatString("Hello");
     
-    char data[] = "secret";
-    encryptData(data, strlen(data));
+    int* ptr = nullptr;
+    nullPointerDeref(ptr);
     
-    readInput();
-    processData();
-    buildPath("/home/user", "document.txt");
-    executeCommand("ls -la");
-    parsePort("8080");
-    allocateBuffer();
+    uninitializedVar();
+    useAfterFree();
+    memoryLeak();
     
-    cout << endl << "=== Analysis Complete ===" << endl;
+    identicalCondition(5, 10);
+    copyPasteError("a", "b");
+    wrongPriority(0x01);
+    charCompare('A');
+    redundantCheck(5);
+    
+    int val = 42;
+    deadCode(&val);
+    
+    dangerousFunction();
+    commandInjection("test.txt");
+    
+    cout << "=== Complete ===" << endl;
     return 0;
 }
