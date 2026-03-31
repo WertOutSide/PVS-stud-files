@@ -126,7 +126,7 @@ void bufferOverflowMemcpy() {
     char src[50] = "This is a very long string that will overflow";
     
     memcpy(dest, src, strlen(src)); 
-
+}
 int* returnLocalAddress() {
     int local = 42;
     
