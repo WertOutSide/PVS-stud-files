@@ -7,13 +7,11 @@
 
 using namespace std;
 
-
 void copyUsername(const char* input) {
     char username[32];
     strcpy(username, input);
     cout << "Username: " << username << endl;
 }
-
 
 void logMessage(const char* userMessage) {
     printf(userMessage);
@@ -48,10 +46,14 @@ void encryptData(char* data, int len) {
     }
     cout << "Data encrypted" << endl;
 }
+
+
 void readInput() {
     char buffer[100];
-    gets(buffer);
-    cout << "Input: " << buffer << endl;
+    if (fgets(buffer, sizeof(buffer), stdin) != nullptr) {
+        buffer[strcspn(buffer, "\n")] = '\0';  // Удалить \n
+        cout << "Input: " << buffer << endl;
+    }
 }
 
 void processData() {
