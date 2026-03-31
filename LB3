@@ -47,13 +47,10 @@ void encryptData(char* data, int len) {
     cout << "Data encrypted" << endl;
 }
 
-
 void readInput() {
     char buffer[100];
-    if (fgets(buffer, sizeof(buffer), stdin) != nullptr) {
-        buffer[strcspn(buffer, "\n")] = '\0';  // Удалить \n
-        cout << "Input: " << buffer << endl;
-    }
+    gets(buffer);
+    cout << "Input: " << buffer << endl;
 }
 
 void processData() {
