@@ -1,0 +1,180 @@
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <fstream>
+
+using namespace std;
+
+void uninitializedVariable() {
+    int sum;
+    int count = 5;
+    
+    for (int i = 0; i < count; i++) {
+        sum += i;
+    }
+    
+    cout << "Sum: " << sum << endl;
+}
+
+void deadStore() {
+    int x = 10;
+    int y = 20;
+    
+    x = 30;
+    
+    cout << "X: " << x << ", Y: " << y << endl;
+}
+
+void unreachableCode(int value) {
+    if (value > 0) {
+        cout << "Positive" << endl;
+        return;
+    }
+    
+    if (value > 0) {
+        cout << "Also positive?" << endl;
+    }
+}
+
+void memoryLeak() {
+    int* data = new int[100];
+    data[0] = 42;
+    
+    data = new int[200];
+    data[0] = 100;
+    
+    delete[] data;
+}
+
+void doubleFree() {
+    int* ptr = new int(5);
+    
+    delete ptr;
+    delete ptr;
+}
+
+void useAfterFree() {
+    char* buffer = new char[64];
+    strcpy(buffer, "Hello");
+    
+    delete[] buffer;
+    
+    cout << buffer << endl;
+}
+
+void nullPointerDeref(int* ptr) {
+    if (ptr != nullptr) {
+        delete ptr;
+    }
+    
+    *ptr = 42;
+}
+
+void uncheckedAllocation() {
+    int* data = new int[1000000];
+    
+    data[0] = 1;
+    
+    delete[] data;
+}
+
+void constantCondition(int x) {
+    if (x > 0) {
+        cout << "Positive" << endl;
+    }
+    
+    if (x > 0) {
+        cout << "Still positive" << endl;
+    } else if (x <= 0) {
+        cout << "Not positive" << endl;
+    }
+}
+
+void parameterOverwrite(int value) {
+    value = 100;
+    
+    cout << "Value: " << value << endl;
+}
+
+void arrayOutOfBounds(int index) {
+    int arr[10];
+    
+    if (index > 0) {
+        arr[index] = 42;  
+    }
+    
+    cout << arr[15] << endl;  
+}
+
+void divisionByZero(int divisor) {
+    int result = 100 / divisor;  
+    
+    cout << "Result: " << result << endl;
+}
+
+void signedUnsignedCompare() {
+    int count = -1;
+    size_t size = 10;
+    
+    if (count < size) {  
+        cout << "Less" << endl;
+    }
+}
+
+void bufferOverflowMemcpy() {
+    char dest[10];
+    char src[50] = "This is a very long string that will overflow";
+    
+    memcpy(dest, src, strlen(src)); 
+
+int* returnLocalAddress() {
+    int local = 42;
+    
+    return &local; 
+}
+
+void fileHandleLeak() {
+    ofstream file("test.txt");
+    file << "Data";
+    
+    // file.close() не вызван - утечка ресурса
+}
+
+void incorrectDelete() {
+    int* arr = new int[100];
+    arr[0] = 10;
+    
+    delete arr;  
+}
+
+void selfAssignment(int& value) {
+    value = value;  // Бессмысленное присваивание
+}
+
+void unusedReturnValue() {
+    strlen("test");  
+    
+    cout << "Done" << endl;
+}
+
+void incorrectAllocationSize() {
+    int count = 100;
+    int* data = new int[count * sizeof(int)];  
+    
+    data[0] = 42;
+    
+    delete[] data;
+}
+
+
+int main() {
+    cout << "=== Lab 4: Data Flow Analysis ===" << endl << endl;
+    
+    uninitializedVariable();
+    deadStore();
+    unreachableCode(5);
+    memoryLeak();
+    
+    cout << endl << "=== Analysis Complete ===" << endl;
+    return 0;
+}
