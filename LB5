@@ -26,16 +26,17 @@ vector<double> readDataFromFile(const char* filename) {
 
 double calculateMean(const vector<double>& data) {
     double sum = 0;
-    for (double val : data) {
-        sum += val;
+    for (size_t i = 0; i < data.size(); i++) {
+        sum += data[i];
     }
     return sum / data.size();
 }
 
 double calculateStdDev(const vector<double>& data, double mean) {
     double sum = 0;
-    for (double val : data) {
-        sum += (val - mean) * (val - mean);
+    for (size_t i = 0; i < data.size(); i++) {
+        double diff = data[i] - mean;
+        sum += diff * diff;
     }
     return sqrt(sum / data.size());
 }
@@ -86,34 +87,28 @@ void processData(const char* inputFile, const char* outputFile) {
 }
 
 void demonstrateBufferIssue() {
-    char buffer[50];
+    char buffer[100];
     
-    cout << "Enter text (max 50 chars): ";
+    cout << "Enter text (max 99 chars): ";
     string input;
     getline(cin, input);
     
-    if (input.length() < sizeof(buffer)) {
-        strcpy(buffer, input.c_str());
-        cout << "Stored: " << buffer << endl;
-    } else {
-        cout << "Input too long, truncated" << endl;
-        strncpy(buffer, input.c_str(), sizeof(buffer) - 1);
-        buffer[sizeof(buffer) - 1] = '\0';
-    }
+    strncpy(buffer, input.c_str(), sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0';
+    
+    cout << "Stored: " << buffer << endl;
 }
 
 void demonstratePointerIssue(int value) {
     int* ptr = nullptr;
+    int localValue = value * 2;
     
     if (value > 0) {
-        int temp = value * 2;
-        ptr = &temp;
+        ptr = &localValue;
     }
     
     if (ptr != nullptr) {
         cout << "Pointer value: " << *ptr << endl;
-    } else {
-        cout << "Pointer is null" << endl;
     }
 }
 
@@ -123,76 +118,4 @@ void demonstrateMemoryIssue(int count) {
         return;
     }
     
-    int* data = new int[count];
-    
-    for (int i = 0; i < count; i++) {
-        data[i] = i * 2;
-    }
-    
-    cout << "Allocated " << count << " integers" << endl;
-    
-    delete[] data;
-}
-
-int main() {
-    cout << "=== Statistics Calculator ===" << endl << endl;
-    
-    int choice;
-    cout << "Choose mode:" << endl;
-    cout << "1. Process data from file" << endl;
-    cout << "2. Manual input and calculate" << endl;
-    cout << "3. Test buffer operations" << endl;
-    cout << "4. Test pointer operations" << endl;
-    cout << "5. Test memory operations" << endl;
-    cout << "Enter choice: ";
-    cin >> choice;
-    cin.ignore();
-    
-    try {
-        if (choice == 1) {
-            string inputFile, outputFile;
-            cout << "Enter input filename: ";
-            cin >> inputFile;
-            cout << "Enter output filename: ";
-            cin >> outputFile;
-            
-            processData(inputFile.c_str(), outputFile.c_str());
-            
-            ifstream resultFile(outputFile);
-            if (resultFile.is_open()) {
-                cout << endl << "Results:" << endl;
-                string line;
-                while (getline(resultFile, line)) {
-                    cout << line << endl;
-                }
-                resultFile.close();
-            }
-            
-        } else if (choice == 2) {
-            int count;
-            cout << "Enter number of values: ";
-            cin >> count;
-            
-            if (count <= 0) {
-                cerr << "Error: Count must be positive!" << endl;
-                return 1;
-            }
-            
-            vector<double> userData(count);
-            cout << "Enter " << count << " values:" << endl;
-            
-            for (int i = 0; i < count; i++) {
-                cout << "Value " << (i+1) << ": ";
-                cin >> userData[i];
-            }
-            
-            double mean = calculateMean(userData);
-            double stddev = calculateStdDev(userData, mean);
-            double minVal, maxVal;
-            findMinMax(userData, minVal, maxVal);
-            
-            cout << endl << "Results:" << endl;
-            cout << "Mean: " << mean << endl;
-            cout << "StdDev: " << stddev << endl;
-            cout << "Min: " << minVal << endl;
-            cout << "Max:
+    int* data = new int
