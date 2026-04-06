@@ -1,135 +1,67 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <stdexcept>
-#include <cmath>
-#include <limits>
+#include <cstring>
 
 using namespace std;
 
-vector<double> readDataFromFile(const char* filename) {
-    vector<double> data;
-    ifstream file(filename);
-    
-    if (!file.is_open()) {
-        throw runtime_error("Cannot open file");
-    }
-    
-    double value;
-    while (file >> value) {
-        data.push_back(value);
-    }
-    
-    return data;
+void bufferOverflow() {
+    char buffer[10];
+    strcpy(buffer, "This is a very long string that will overflow");
+    cout << buffer << endl;
 }
 
-double calculateMean(const vector<double>& data) {
-    double sum = 0;
-    for (double val : data) {
-        sum += val;
-    }
-    return sum / data.size();
+void nullPointerDeref() {
+    int* ptr = nullptr;
+    *ptr = 42;
+    cout << *ptr << endl;
 }
 
-double calculateStdDev(const vector<double>& data, double mean) {
-    double sum = 0;
-    for (double val : data) {
-        sum += (val - mean) * (val - mean);
-    }
-    return sqrt(sum / data.size());
+void uninitializedVar() {
+    int x;
+    cout << x << endl;
 }
 
-void findMinMax(const vector<double>& data, double& minVal, double& maxVal) {
-    minVal = data[0];
-    maxVal = data[0];
-    
-    for (size_t i = 1; i < data.size(); i++) {
-        if (data[i] < minVal) minVal = data[i];
-        if (data[i] > maxVal) maxVal = data[i];
-    }
+void memoryLeak() {
+    int* data = new int[100];
+    data = new int[200];
+    delete[] data;
 }
 
-void writeResults(const char* filename, double mean, double stddev, 
-                  double minVal, double maxVal) {
-    ofstream file(filename);
-    
-    if (!file.is_open()) {
-        throw runtime_error("Cannot create output file");
-    }
-    
-    file << "Mean: " << mean << endl;
-    file << "StdDev: " << stddev << endl;
-    file << "Min: " << minVal << endl;
-    file << "Max: " << maxVal << endl;
+void doubleFree() {
+    int* ptr = new int(5);
+    delete ptr;
+    delete ptr;
 }
 
-void processData(const char* inputFile, const char* outputFile) {
-    vector<double> data = readDataFromFile(inputFile);
-    
-    double mean = calculateMean(data);
-    double stddev = calculateStdDev(data, mean);
-    
-    double minVal, maxVal;
-    findMinMax(data, minVal, maxVal);
-    
-    writeResults(outputFile, mean, stddev, minVal, maxVal);
-    
-    cout << "Processing complete!" << endl;
+void useAfterFree() {
+    char* buffer = new char[64];
+    delete[] buffer;
+    strcpy(buffer, "test");
 }
 
-bool getUserInput(int& count) {
-    cout << "Enter number of values: ";
-    cin >> count;
-    
-    return true;
+void divisionByZero(int x) {
+    int result = 100 / x;
+    cout << result << endl;
+}
+
+void arrayOutOfBounds() {
+    int arr[10];
+    arr[15] = 42;
+    cout << arr[15] << endl;
 }
 
 int main() {
-    cout << "=== Statistics Calculator ===" << endl << endl;
+    cout << "=== Test ===" << endl;
     
-    int choice;
-    cout << "Choose mode:" << endl;
-    cout << "1. Read from file" << endl;
-    cout << "2. Manual input" << endl;
-    cout << "Enter choice: ";
-    cin >> choice;
+    bufferOverflow();
+    nullPointerDeref();
+    uninitializedVar();
+    memoryLeak();
+    doubleFree();
+    useAfterFree();
+    divisionByZero(0);
+    arrayOutOfBounds();
     
-    if (choice == 1) {
-        string inputFile, outputFile;
-        cout << "Enter input filename: ";
-        cin >> inputFile;
-        cout << "Enter output filename: ";
-        cin >> outputFile;
-        
-        processData(inputFile.c_str(), outputFile.c_str());
-        
-    } else if (choice == 2) {
-        int count;
-        getUserInput(count);
-        
-        vector<double> userData(count);
-        cout << "Enter " << count << " values:" << endl;
-        
-        for (int i = 0; i < count; i++) {
-            cin >> userData[i];
-        }
-        
-        double mean = calculateMean(userData);
-        double stddev = calculateStdDev(userData, mean);
-        double minVal, maxVal;
-        findMinMax(userData, minVal, maxVal);
-        
-        cout << endl << "Results:" << endl;
-        cout << "Mean: " << mean << endl;
-        cout << "StdDev: " << stddev << endl;
-        cout << "Min: " << minVal << endl;
-        cout << "Max: " << maxVal << endl;
-        
-    } else {
-        cerr << "Invalid choice!" << endl;
-        return 1;
-    }
-    
-    cout << endl << "=== Complete ===" << endl;
     return 0;
 }
