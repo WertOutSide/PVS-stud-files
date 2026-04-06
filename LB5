@@ -2,224 +2,208 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
-#include <cmath>
-#include <limits>
+#include <memory>
 #include <cstring>
 
 using namespace std;
 
-vector<double> readDataFromFile(const char* filename) {
-    vector<double> data;
-    ifstream file(filename);
-    
-    if (!file.is_open()) {
-        throw runtime_error("Cannot open file");
-    }
-    
-    double value;
-    while (file >> value) {
-        data.push_back(value);
-    }
-    
+int* allocateData(int size) {
+    int* data = new int[size];
     return data;
 }
 
-double calculateMean(const vector<double>& data) {
-    double sum = 0;
-    for (size_t i = 0; i < data.size(); i++) {
-        sum += data[i];
+void processData(int* data, int size) {
+    int* temp = new int[size * 2];
+    
+    if (size > 100) {
+        throw runtime_error("Size too large");
     }
-    return sum / data.size();
+    
+    for (int i = 0; i < size; i++) {
+        temp[i] = data[i] * 2;
+    }
+    
+    delete[] temp;
 }
 
-double calculateStdDev(const vector<double>& data, double mean) {
-    double sum = 0;
-    for (size_t i = 0; i < data.size(); i++) {
-        double diff = data[i] - mean;
-        sum += diff * diff;
-    }
-    return sqrt(sum / data.size());
+vector<double>& getStatistics() {
+    vector<double> stats(3);
+    stats[0] = 1.0;
+    stats[1] = 2.0;
+    stats[2] = 3.0;
+    
+    return stats;
 }
 
-void findMinMax(const vector<double>& data, double& minVal, double& maxVal) {
-    if (data.empty()) {
-        throw runtime_error("Data is empty");
-    }
-    minVal = data[0];
-    maxVal = data[0];
+void cleanupData(int* ptr1, int* ptr2) {
+    delete ptr1;
+    delete ptr2;
     
-    for (size_t i = 1; i < data.size(); i++) {
-        if (data[i] < minVal) minVal = data[i];
-        if (data[i] > maxVal) maxVal = data[i];
-    }
-}
-
-void writeResults(const char* filename, double mean, double stddev, 
-                  double minVal, double maxVal) {
-    ofstream file(filename);
-    
-    if (!file.is_open()) {
-        throw runtime_error("Cannot create output file");
-    }
-    
-    file << "Mean: " << mean << endl;
-    file << "StdDev: " << stddev << endl;
-    file << "Min: " << minVal << endl;
-    file << "Max: " << maxVal << endl;
-}
-
-void processData(const char* inputFile, const char* outputFile) {
-    vector<double> data = readDataFromFile(inputFile);
-    
-    if (data.empty()) {
-        throw runtime_error("No data to process");
-    }
-    
-    double mean = calculateMean(data);
-    double stddev = calculateStdDev(data, mean);
-    
-    double minVal, maxVal;
-    findMinMax(data, minVal, maxVal);
-    
-    writeResults(outputFile, mean, stddev, minVal, maxVal);
-    
-    cout << "Processing complete!" << endl;
-}
-
-void demonstrateBufferIssue() {
-    char buffer[100];
-    
-    cout << "Enter text (max 99 chars): ";
-    string input;
-    getline(cin, input);
-    
-    strncpy(buffer, input.c_str(), sizeof(buffer) - 1);
-    buffer[sizeof(buffer) - 1] = '\0';
-    
-    cout << "Stored: " << buffer << endl;
-}
-
-void demonstratePointerIssue(int value) {
-    int* ptr = nullptr;
-    int localValue = value * 2;
-    
-    if (value > 0) {
-        ptr = &localValue;
-    }
-    
-    if (ptr != nullptr) {
-        cout << "Pointer value: " << *ptr << endl;
+    if (ptr1 == ptr2) {
+        cout << "Same pointers" << endl;
     }
 }
 
-void demonstrateMemoryIssue(int count) {
-    if (count <= 0 || count > 1000) {
-        cout << "Invalid count" << endl;
-        return;
+void useAfterFreeBug(int* data) {
+    delete[] data;
+    
+    cout << "Data[0] = " << data[0] << endl;
+}
+
+void modifyValue(int value) {
+    value = 100;
+}
+
+class DataProcessor {
+private:
+    int* buffer;
+    ifstream file;
+    
+public:
+    DataProcessor(const char* filename) {
+        buffer = new int[1000];
+        file.open(filename);
+        
+        if (!file.is_open()) {
+            throw runtime_error("Cannot open file");
+        }
     }
     
-    int* data = new int[count];
-    
-    for (int i = 0; i < count; i++) {
-        data[i] = i * 2;
+    ~DataProcessor() {
+        delete[] buffer;
+        file.close();
     }
+};
+
+bool validateInput(int value) {
+    if (value < 0) {
+        return false;
+    }
+    return true;
+}
+
+void processUserInput() {
+    int value;
+    cout << "Enter value: ";
+    cin >> value;
     
-    cout << "First value: " << data[0] << endl;
+    validateInput(value);
+    
+    cout << "Processing..." << endl;
+}
+
+void riskyOperation() {
+    throw runtime_error("Something went wrong");
+}
+
+void handleOperation() {
+    try {
+        riskyOperation();
+    } catch (...) {
+    }
+}
+
+int* findElement(int* arr, int size, int value) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i] == value) {
+            return &arr[i];
+        }
+    }
+    return nullptr;
+}
+
+void useElement(int* arr, int size, int value) {
+    int* result = findElement(arr, size, value);
+    
+    cout << "Found: " << *result << endl;
+}
+
+void copyData(const char* src) {
+    char dest[50];
+    
+    size_t len = strlen(src);
+    memcpy(dest, src, len);
+    
+    cout << "Copied: " << dest << endl;
+}
+
+void reallocateBug() {
+    int* data = new int[100];
+    data[0] = 42;
+    
+    data = new int[200];
+    data[0] = 100;
     
     delete[] data;
 }
 
 int main() {
-    cout << "=== Statistics Calculator ===" << endl << endl;
+    cout << "=== Interprocedural Analysis Demo ===" << endl << endl;
     
     int choice;
-    cout << "Choose mode:" << endl;
-    cout << "1. Process data from file" << endl;
-    cout << "2. Manual input and calculate" << endl;
-    cout << "3. Test buffer operations" << endl;
-    cout << "4. Test pointer operations" << endl;
-    cout << "5. Test memory operations" << endl;
-    cout << "Enter choice: ";
+    cout << "Choose test (1-12): ";
     cin >> choice;
-    cin.ignore();
     
     try {
-        if (choice == 1) {
-            string inputFile, outputFile;
-            cout << "Enter input filename: ";
-            cin >> inputFile;
-            cout << "Enter output filename: ";
-            cin >> outputFile;
-            
-            processData(inputFile.c_str(), outputFile.c_str());
-            
-            ifstream resultFile(outputFile);
-            if (resultFile.is_open()) {
-                cout << endl << "Results:" << endl;
-                string line;
-                while (getline(resultFile, line)) {
-                    cout << line << endl;
-                }
-                resultFile.close();
+        switch (choice) {
+            case 1: {
+                int* data = allocateData(50);
+                processData(data, 50);
+                delete[] data;
+                break;
             }
-            
-        } else if (choice == 2) {
-            int count;
-            cout << "Enter number of values: ";
-            cin >> count;
-            
-            if (count <= 0) {
-                cerr << "Error: Count must be positive!" << endl;
-                return 1;
+            case 2: {
+                vector<double>& stats = getStatistics();
+                cout << "Stats: " << stats[0] << endl;
+                break;
             }
-            
-            vector<double> userData(count);
-            cout << "Enter " << count << " values:" << endl;
-            
-            for (int i = 0; i < count; i++) {
-                cout << "Value " << (i+1) << ": ";
-                cin >> userData[i];
+            case 3: {
+                int* ptr = new int(10);
+                cleanupData(ptr, ptr);
+                break;
             }
-            
-            if (userData.empty()) {
-                cerr << "Error: No data entered!" << endl;
-                return 1;
+            case 4: {
+                int* data = new int[10];
+                data[0] = 42;
+                useAfterFreeBug(data);
+                break;
             }
-            
-            double mean = calculateMean(userData);
-            double stddev = calculateStdDev(userData, mean);
-            double minVal, maxVal;
-            findMinMax(userData, minVal, maxVal);
-            
-            cout << endl << "Results:" << endl;
-            cout << "Mean: " << mean << endl;
-            cout << "StdDev: " << stddev << endl;
-            cout << "Min: " << minVal << endl;
-            cout << "Max: " << maxVal << endl;
-            
-        } else if (choice == 3) {
-            demonstrateBufferIssue();
-            
-        } else if (choice == 4) {
-            int value;
-            cout << "Enter a positive number: ";
-            cin >> value;
-            demonstratePointerIssue(value);
-            
-        } else if (choice == 5) {
-            int count;
-            cout << "Enter memory size (1-1000): ";
-            cin >> count;
-            demonstrateMemoryIssue(count);
-            
-        } else {
-            cerr << "Invalid choice!" << endl;
-            return 1;
+            case 5: {
+                int value = 5;
+                modifyValue(value);
+                cout << "Value: " << value << endl;
+                break;
+            }
+            case 6: {
+                DataProcessor processor("test.txt");
+                break;
+            }
+            case 7: {
+                processUserInput();
+                break;
+            }
+            case 8: {
+                handleOperation();
+                break;
+            }
+            case 9: {
+                int arr[] = {1, 2, 3, 4, 5};
+                useElement(arr, 5, 3);
+                break;
+            }
+            case 10: {
+                copyData("Hello World");
+                break;
+            }
+            case 11: {
+                reallocateBug();
+                break;
+            }
+            default:
+                cout << "Invalid choice" << endl;
         }
-        
     } catch (const exception& e) {
         cerr << "Error: " << e.what() << endl;
-        return 1;
     }
     
     cout << endl << "=== Complete ===" << endl;
