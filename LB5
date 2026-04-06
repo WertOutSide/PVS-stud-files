@@ -1,0 +1,114 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <stdexcept>
+#include <memory>
+#include <numeric>
+
+using namespace std;
+
+vector<double> readDataFromFile(const char* filename) {
+    vector<double> data;
+    ifstream file(filename);
+    
+    if (!file.is_open()) {
+        throw runtime_error("Cannot open file");
+    }
+    
+    double value;
+    while (file >> value) {
+        data.push_back(value);
+    }
+
+    
+    return data;
+}
+double calculateMean(const vector<double>& data) {
+    double sum = 0;
+    for (double val : data) {
+        sum += val;
+    }
+    return sum / data.size();
+}
+
+double calculateStdDev(const vector<double>& data, double mean) {
+    double sum = 0;
+    for (double val : data) {
+        sum += (val - mean) * (val - mean);
+    }
+    return sqrt(sum / data.size());
+}
+
+void findMinMax(const vector<double>& data, double& minVal, double& maxVal) {
+
+    minVal = data[0];
+    maxVal = data[0];
+    
+    for (size_t i = 1; i < data.size(); i++) {
+        if (data[i] < minVal) minVal = data[i];
+        if (data[i] > maxVal) maxVal = data[i];
+    }
+}
+
+void writeResults(const char* filename, double mean, double stddev, 
+                  double minVal, double maxVal) {
+    ofstream file(filename);
+    
+    if (!file.is_open()) {
+        throw runtime_error("Cannot create output file");
+    }
+    
+    file << "Mean: " << mean << endl;
+    file << "StdDev: " << stddev << endl;
+    file << "Min: " << minVal << endl;
+    file << "Max: " << maxVal << endl;
+
+}
+
+void processData(const char* inputFile, const char* outputFile) {
+    vector<double> data = readDataFromFile(inputFile);
+    
+    double mean = calculateMean(data);
+    double stddev = calculateStdDev(data, mean);
+    
+    double minVal, maxVal;
+    findMinMax(data, minVal, maxVal);
+    
+    writeResults(outputFile, mean, stddev, minVal, maxVal);
+    
+    cout << "Processing complete!" << endl;
+}
+
+void getUserInput(int& count) {
+    cout << "Enter number of values: ";
+    cin >> count;
+  
+}
+
+int main() {
+    cout << "=== Statistics Calculator ===" << endl << endl;
+    
+    // Режим 1: Из файла
+    try {
+        processData("input.txt", "output.txt");
+    } catch (const exception& e) {
+        cerr << "File processing error: " << e.what() << endl;
+    }
+    
+    int count;
+    getUserInput(count);
+    
+    vector<double> userData(count);
+    cout << "Enter " << count << " values:" << endl;
+    
+    for (int i = 0; i < count; i++) {
+        cin >> userData[i];
+    }
+    
+    double mean = calculateMean(userData);
+    cout << "Mean: " << mean << endl;
+    
+    
+    cout << endl << "=== Complete ===" << endl;
+    return 0;
+}
